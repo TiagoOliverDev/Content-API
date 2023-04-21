@@ -5,16 +5,17 @@ from pydantic import BaseModel
 app = FastAPI() #Só com esse comando a api já está criada
 
 dados = {
-    1: {"Nome": "Tiago", "Email": "teste", "Senha": "teste", "Confirmar-senha": "teste"},
-    2: {"Nome": "Tiago1", "Email": "teste", "Senha": "teste", "Confirmar-senha": "teste"},
-    3: {"Nome": "Tiago2", "Email": "teste", "Senha": "teste", "Confirmar-senha": "teste"},
-    4: {"Nome": "Tiago3", "Email": "teste", "Senha": "teste", "Confirmar-senha": "teste"},
+    1: {"Name": "Tiago", "Email": "teste", "Password": "teste", "ConfirmPassword": "teste"},
+    2: {"Name": "Tiago1", "Email": "teste", "Password": "teste", "ConfirmPassword": "teste"},
+    3: {"Name": "Tiago2", "Email": "teste", "Password": "teste", "ConfirmPassword": "teste"},
+    4: {"Name": "Tiago3", "Email": "teste", "Password": "teste", "ConfirmPassword": "teste"},
 }
 
-class ItemForSale(BaseModel):
-    name_item: str
-    preco_unitario: float
-    quantidade: int
+class Api(BaseModel):
+    Name: str
+    Email: str
+    Password: str
+    ConfirmPassword: str
 
 @app.get("/") #@ = decorator
 async def home():
