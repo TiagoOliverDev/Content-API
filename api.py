@@ -51,7 +51,7 @@ async def get_sale(id_user: int): # recebendo parâmetro e passando sua tipagem
 @app.put("/update_user/{id_user}")
     
 class UserUpdate(BaseModel):
-    Name: str
+    Username: str
     Email: str
     Password: str
     ConfirmPassword: str
@@ -67,6 +67,7 @@ async def update_user(user: UserUpdate):
     user_id = max(dados.keys()) + 1
     dados[user_id] = user_dict
     return {"id_user": user_id}
+
 
 
 if __name__ == '__main__':
