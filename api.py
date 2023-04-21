@@ -41,7 +41,6 @@ async def create_user(user: UserCreate):
     dados[user_id] = user_dict
     return {"id_user": user_id}
 
-
 @app.get("/cadastrados/{id_user}")
 async def get_sale(id_user: int): # recebendo parâmetro e passando sua tipagem
     if id_user in dados:
@@ -49,7 +48,25 @@ async def get_sale(id_user: int): # recebendo parâmetro e passando sua tipagem
     else:
         return {"Erro": "ID de user inexistente!"}
 
-  
+@app.put("/update_user/{id_user}")
+    
+class UserUpdate(BaseModel):
+    Name: str
+    Email: str
+    Password: str
+    ConfirmPassword: str
+
+    @validator('ConfirmPassword') # Function para verificar senha e confirmar senha
+    def passwords_match(cls, v, values):
+        if 'Password' in values and v != values['Password']:
+            raise ValueError('ConfirmPassword não confere com o Password')
+        return v
+
+async def update_user(user: UserUpdate):
+    user_dict = user.dict()
+    user_id = max(dados.keys()) + 1
+    dados[user_id] = user_dict
+    return {"id_user": user_id}
 
 
 if __name__ == '__main__':
