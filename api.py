@@ -28,7 +28,7 @@ class UserCreate(BaseModel):
     Password: str
     ConfirmPassword: str
 
-    @validator('ConfirmPassword')
+    @validator('ConfirmPassword') # Function para verificar senha e confirmar senha
     def passwords_match(cls, v, values):
         if 'Password' in values and v != values['Password']:
             raise ValueError('ConfirmPassword não confere com o Password')
