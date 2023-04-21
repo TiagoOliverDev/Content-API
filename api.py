@@ -12,7 +12,7 @@ dados = {
 }
 
 class Api(BaseModel):
-    Name: str
+    Username: str
     Email: str
     Password: str
     ConfirmPassword: str
@@ -23,7 +23,7 @@ async def home():
     return {"cadastro": len(dados)}
 
 class UserCreate(BaseModel):
-    Name: str
+    Username: str
     Email: str
     Password: str
     ConfirmPassword: str
