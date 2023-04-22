@@ -69,48 +69,19 @@ class UserUseCases:
         }
     
 
-    # def user_login(self, user: User, expires_in: int = 30):
-    #     user_on_db = self.db_session.query(UserModel).filter_by(username=user.username).first()
-
-    #     if user_on_db is None:
-    #         raise HTTPException(
-    #             status_code=status.HTTP_401_UNAUTHORIZED,
-    #             detail='Invalid username or password'
-    #         )
+    def verify_token(self, access_token):
+        try:
+            data = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
+        except JWTError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='Invalid access token'
+            )
         
-    #     if not crypt_context.verify(user.password, user_on_db.password):
-    #         raise HTTPException(
-    #             status_code=status.HTTP_401_UNAUTHORIZED,
-    #             detail='Invalid username or password'
-    #         )
-        
-    #     exp = datetime.utcnow() + timedelta(minutes=expires_in)
+        user_on_db = self.db_session.query(UserModel).filter_by(username=data['sub']).first()
 
-    #     payload = {
-    #         'sub': user.username,
-    #         'exp': exp
-    #     }
-
-    #     access_token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-
-    #     return {
-    #         'access_token': access_token,
-    #         'exp': exp.isoformat()
-    #     }
-
-    # def verify_token(self, access_token):
-    #     try:
-    #         data = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
-    #     except JWTError:
-    #         raise HTTPException(
-    #             status_code=status.HTTP_401_UNAUTHORIZED,
-    #             detail='Invalid access token'
-    #         )
-        
-    #     user_on_db = self.db_session.query(UserModel).filter_by(username=data['sub']).first()
-
-    #     if user_on_db is None:
-    #         raise HTTPException(
-    #             status_code=status.HTTP_401_UNAUTHORIZED,
-    #             detail='Invalid access token'
-    #         )
+        if user_on_db is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='Invalid access token'
+            )

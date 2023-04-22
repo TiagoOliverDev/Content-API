@@ -2,13 +2,15 @@ from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from app.depends import get_db_session
+from app.depends import get_db_session, token_verifier
 from app.auth_user import UserUseCases
 from app.schemas import User
 
-router = APIRouter(prefix='/user')
+user_router = APIRouter(prefix='/user')
+test_router = APIRouter(prefix='/test ', dependencies=[Depends(token_verifier)]) # Adicionando dependencias para todas as rotas, assim não precisamos colocar o token rota a rota
 
-@router.post('/register')
+
+@user_router.post('/register')
 def user_register(user: User, db_session: Session = Depends(get_db_session)):
     # recebenco user no boddy da requisição
     # essa função recebe uma instância da sessão (Depends(get_db_session))
@@ -20,7 +22,7 @@ def user_register(user: User, db_session: Session = Depends(get_db_session)):
     )
 
 
-@router.post('/login')
+@user_router.post('/login')
 def user_login(
     request_form_user: OAuth2PasswordRequestForm = Depends(),  
     db_session: Session = Depends(get_db_session)
@@ -39,3 +41,7 @@ def user_login(
     )
 
 
+# Endpoint para verificar autenticidade do token
+@test_router.get('/test')
+def test_user_verify():
+    return 'It works'
