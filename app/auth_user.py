@@ -34,22 +34,25 @@ class UserUseCases:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail='User already exists'
             )
-
+        
     def user_login(self, user: User, expires_in: int = 30):
         user_on_db = self.db_session.query(UserModel).filter_by(username=user.username).first()
 
+        # caso de erro ao logar
         if user_on_db is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail='Invalid username or password'
             )
-        
+
+        # verificando a senha, como parâmetro passamos a senha vinda do input e a senha salva no db
         if not crypt_context.verify(user.password, user_on_db.password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail='Invalid username or password'
             )
         
+        # token vai expirar de agora + 30 minutos que o valor de expires_in
         exp = datetime.utcnow() + timedelta(minutes=expires_in)
 
         payload = {
@@ -57,26 +60,57 @@ class UserUseCases:
             'exp': exp
         }
 
-        access_token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+        access_token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM) 
+
 
         return {
             'access_token': access_token,
             'exp': exp.isoformat()
         }
+    
 
-    def verify_token(self, access_token):
-        try:
-            data = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
-        except JWTError:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail='Invalid access token'
-            )
+    # def user_login(self, user: User, expires_in: int = 30):
+    #     user_on_db = self.db_session.query(UserModel).filter_by(username=user.username).first()
+
+    #     if user_on_db is None:
+    #         raise HTTPException(
+    #             status_code=status.HTTP_401_UNAUTHORIZED,
+    #             detail='Invalid username or password'
+    #         )
         
-        user_on_db = self.db_session.query(UserModel).filter_by(username=data['sub']).first()
+    #     if not crypt_context.verify(user.password, user_on_db.password):
+    #         raise HTTPException(
+    #             status_code=status.HTTP_401_UNAUTHORIZED,
+    #             detail='Invalid username or password'
+    #         )
+        
+    #     exp = datetime.utcnow() + timedelta(minutes=expires_in)
 
-        if user_on_db is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail='Invalid access token'
-            )
+    #     payload = {
+    #         'sub': user.username,
+    #         'exp': exp
+    #     }
+
+    #     access_token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+    #     return {
+    #         'access_token': access_token,
+    #         'exp': exp.isoformat()
+    #     }
+
+    # def verify_token(self, access_token):
+    #     try:
+    #         data = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
+    #     except JWTError:
+    #         raise HTTPException(
+    #             status_code=status.HTTP_401_UNAUTHORIZED,
+    #             detail='Invalid access token'
+    #         )
+        
+    #     user_on_db = self.db_session.query(UserModel).filter_by(username=data['sub']).first()
+
+    #     if user_on_db is None:
+    #         raise HTTPException(
+    #             status_code=status.HTTP_401_UNAUTHORIZED,
+    #             detail='Invalid access token'
+    #         )
